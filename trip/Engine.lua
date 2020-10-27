@@ -1,4 +1,5 @@
 local Class = require("trip.Class")
+local Creature = require("trip.Creature")
 local physics = require("trip.physics")
 
 local M = Class.new()
@@ -8,10 +9,7 @@ function M:init(resources, config)
   self.accumulatedDt = 0
 
   self.world = love.physics.newWorld()
-
-  self.body = love.physics.newBody(self.world)
-  local shape = love.physics.newCircleShape(0.5)
-  self.fixture = love.physics.newFixture(self.body, shape)
+  Creature.new(self, {})
 end
 
 function M:update(dt)
