@@ -8,8 +8,19 @@ function M:init(resources, config)
   self.fixedDt = config.fixedDt or 1 / 60
   self.accumulatedDt = 0
 
-  self.world = love.physics.newWorld()
-  Creature.new(self, {})
+  local gravityX = config.gravityX or 0
+  local gravityY = config.gravityY or 16
+
+  self.world = love.physics.newWorld(gravityX, gravityY)
+
+  self.body = love.physics.newBody(self.world)
+  local shape = love.physics.newRectangleShape(0, 2, 8, 0.5)
+  self.fixture = love.physics.newFixture(self.body, shape)
+
+  Creature.new(self, {
+    x = 0,
+    y = -2,
+  })
 end
 
 function M:update(dt)

@@ -5,7 +5,10 @@ local M = Class.new()
 function M:init(engine, config)
   self.engine = assert(engine)
 
-  self.body = love.physics.newBody(self.engine.world)
+  local x = config.x or 0
+  local y = config.y or 0
+
+  self.body = love.physics.newBody(self.engine.world, x, y, "dynamic")
   local shape = love.physics.newCircleShape(0.5)
   self.fixture = love.physics.newFixture(self.body, shape)
 end
