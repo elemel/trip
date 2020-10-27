@@ -42,8 +42,9 @@ function M:draw()
   local scale = height * 1 / 8
   love.graphics.scale(scale)
   love.graphics.setLineWidth(1 / scale)
-  physics.debugDrawFixtures(self.world)
 
+  physics.debugDrawFixtures(self.world)
+  physics.debugDrawJoints(self.world)
 end
 
 return M

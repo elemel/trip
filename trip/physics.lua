@@ -38,4 +38,10 @@ function M.debugDrawFixtures(world)
   end
 end
 
+function M.debugDrawJoints(world)
+  for _, joint in ipairs(world:getJoints()) do
+    love.graphics.line(joint:getAnchors())
+  end
+end
+
 return M
