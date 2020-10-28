@@ -8,6 +8,9 @@ function M:init(resources, config)
   self.fixedDt = config.fixedDt or 1 / 60
   self.accumulatedDt = 0
 
+  self.accumulatedMouseDx = 0
+  self.accumulatedMouseDy = 0
+
   local gravityX = config.gravityX or 0
   local gravityY = config.gravityY or 16
 
@@ -16,6 +19,8 @@ function M:init(resources, config)
   self.body = love.physics.newBody(self.world)
   local shape = love.physics.newRectangleShape(0, 2, 8, 0.5)
   self.fixture = love.physics.newFixture(self.body, shape)
+
+  self.creatures = {}
 
   Creature.new(self, {
     x = 0,
@@ -33,6 +38,10 @@ function M:update(dt)
 end
 
 function M:fixedUpdate(dt)
+  for _, creature in ipairs(self.creatures) do
+    creature:fixedUpdateControl(dt)
+  end
+
   self.world:update(dt)
 end
 
@@ -45,6 +54,11 @@ function M:draw()
 
   physics.debugDrawFixtures(self.world)
   physics.debugDrawJoints(self.world)
+end
+
+function M:mousemoved(x, y, dx, dy, istouch)
+  self.accumulatedMouseDx = self.accumulatedMouseDx + dx
+  self.accumulatedMouseDy = self.accumulatedMouseDy + dy
 end
 
 return M

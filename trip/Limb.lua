@@ -9,18 +9,20 @@ local sin = math.sin
 
 local M = Class.new()
 
-function M:init(engine, creature, config)
-  self.engine = assert(engine)
+function M:init(creature, config)
   self.creature = assert(creature)
+  self.engine = assert(creature.engine)
 
   local x = config.x or 0
   local y = config.y or 0
 
   x, y = self.creature.body:getWorldPoint(x, y)
   self.body = love.physics.newBody(self.engine.world, x, y, "dynamic")
+  self.body:setFixedRotation(true)
+
   local shape = love.physics.newCircleShape(0.125)
   self.fixture = love.physics.newFixture(self.body, shape)
-  self.fixture:setSensor(true)
+  -- self.fixture:setSensor(true)
 
   local baseAngle = love.math.random() * 2 * pi
   self.distanceJoints = {}
@@ -36,9 +38,12 @@ function M:init(engine, creature, config)
     self.distanceJoints[i] = love.physics.newDistanceJoint(
       self.creature.body, self.body, x1, y1, x, y)
 
-    self.distanceJoints[i]:setFrequency(4)
+    self.distanceJoints[i]:setFrequency(8)
     self.distanceJoints[i]:setDampingRatio(1)
   end
+
+  self.localTargetX = 0
+  self.localTargetY = 0
 
   insert(self.creature.limbs, self)
 end

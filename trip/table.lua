@@ -11,9 +11,12 @@ end
 local function removeLast(t, v)
   local i = findLast(t, v)
 
-  if i then
-    remove(t, i)
+  if not i then
+    return nil
   end
+
+  remove(t, i)
+  return i
 end
 
 return {
