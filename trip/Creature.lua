@@ -29,12 +29,12 @@ function M:init(engine, config)
   for i = 1, 5 do
     local angle = (i + love.math.random()) * 2 * pi / 5
 
-    local x = cos(angle)
-    local y = sin(angle)
+    local localX = cos(angle)
+    local localY = sin(angle)
 
     Limb.new(self, {
-      x = x,
-      y = y,
+      localX = localX,
+      localY = localY,
     })
   end
 
@@ -76,11 +76,11 @@ function M:fixedUpdateControl(dt)
 
   local targetX, targetY = self.body:getWorldPoint(limb.localTargetX, limb.localTargetY)
 
-  for _, joint in ipairs(limb.distanceJoints) do
+  for _, joint in ipairs(limb.state.distanceJoints) do
     local anchorX, anchorY = joint:getAnchors()
     length = distance2(anchorX, anchorY, targetX, targetY)
     joint:setLength(length)
-    limb.body:setAwake(true)
+    limb.state.body:setAwake(true)
   end
 end
 
