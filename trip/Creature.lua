@@ -18,7 +18,10 @@ function M:init(engine, config)
   local x = config.x or 0
   local y = config.y or 0
 
+  local angle = love.math.random() * 2 * pi
+
   self.body = love.physics.newBody(self.engine.world, x, y, "dynamic")
+  self.body:setAngle(angle)
 
   self.radius = config.radius or 0.5
   local shape = love.physics.newCircleShape(self.radius)
@@ -29,14 +32,23 @@ function M:init(engine, config)
   for i = 1, 5 do
     local angle = (i + love.math.random()) * 2 * pi / 5
 
-    local localX = cos(angle)
-    local localY = sin(angle)
+    local directionX = cos(angle)
+    local directionY = sin(angle)
 
     Limb.new(self, {
-      localX = localX,
-      localY = localY,
+      localSocketX = directionX * self.radius,
+      localSocketY = directionY * self.radius,
+
+      localPawX = directionX * 2 * self.radius,
+      localPawY = directionY * 2 * self.radius,
     })
   end
+
+  self.aimInputDx = 0
+  self.aimInputDy = 0
+
+  self.moveInputX = 0
+  self.moveInputY = 0
 
   insert(self.engine.creatures, self)
 end
@@ -56,31 +68,14 @@ function M:destroy()
 end
 
 function M:fixedUpdateControl(dt)
-  local mouseSensitivity = 1 / 256
+  for _, limb in ipairs(self.limbs) do
+    limb.state:fixedUpdateControl(dt)
+  end
+end
 
-  local dx = self.engine.accumulatedMouseDx
-  local dy = self.engine.accumulatedMouseDy
-
-  self.engine.accumulatedMouseDx = 0
-  self.engine.accumulatedMouseDy = 0
-
-  dx = dx * mouseSensitivity
-  dy = dy * mouseSensitivity
-
-  dx, dy = self.body:getLocalVector(dx, dy)
-
-  local limb = self.limbs[1]
-
-  limb.localTargetX = limb.localTargetX + dx
-  limb.localTargetY = limb.localTargetY + dy
-
-  local targetX, targetY = self.body:getWorldPoint(limb.localTargetX, limb.localTargetY)
-
-  for _, joint in ipairs(limb.state.distanceJoints) do
-    local anchorX, anchorY = joint:getAnchors()
-    length = distance2(anchorX, anchorY, targetX, targetY)
-    joint:setLength(length)
-    limb.state.body:setAwake(true)
+function M:fixedUpdateCollision(dt)
+  for _, limb in ipairs(self.limbs) do
+    limb.state:fixedUpdateCollision(dt)
   end
 end
 

@@ -1,5 +1,5 @@
 local Class = require("trip.Class")
-local LimbFeelerState = require("trip.LimbFeelerState")
+local LimbSensorState = require("trip.LimbSensorState")
 local tripTable = require("trip.table")
 
 local insert = table.insert
@@ -11,15 +11,14 @@ function M:init(creature, config)
   self.creature = assert(creature)
   self.engine = assert(creature.engine)
 
-  self.localX = config.localX or 0
-  self.localY = config.localY or 0
+  self.localSocketX = config.localSocketX or 0
+  self.localSocketY = config.localSocketY or 0
 
-  self.localTargetX = 0
-  self.localTargetY = 0
+  self.localPawX = config.localPawX or self.localSocketX
+  self.localPawY = config.localPawY or self.localSocketY
 
   insert(self.creature.limbs, self)
-
-  self.state = LimbFeelerState.new(self, {})
+  self.state = LimbSensorState.new(self, {})
 end
 
 function M:destroy()

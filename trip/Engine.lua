@@ -1,5 +1,7 @@
 local Class = require("trip.Class")
 local Creature = require("trip.Creature")
+local KeyboardMouseDevice = require("trip.KeyboardMouseDevice")
+local Player = require("trip.Player")
 local physics = require("trip.physics")
 
 local M = Class.new()
@@ -21,11 +23,16 @@ function M:init(resources, config)
   self.fixture = love.physics.newFixture(self.body, shape)
 
   self.creatures = {}
+  self.keyboardMouseDevices = {}
+  self.players = {}
 
-  Creature.new(self, {
+  local creature = Creature.new(self, {
     x = 0,
     y = -2,
   })
+
+  local inputDevice = KeyboardMouseDevice.new(self, {})
+  Player.new(creature, inputDevice, {})
 end
 
 function M:update(dt)
@@ -38,11 +45,19 @@ function M:update(dt)
 end
 
 function M:fixedUpdate(dt)
+  for _, player in ipairs(self.players) do
+    player:fixedUpdateInput(dt)
+  end
+
   for _, creature in ipairs(self.creatures) do
     creature:fixedUpdateControl(dt)
   end
 
   self.world:update(dt)
+
+  for _, creature in ipairs(self.creatures) do
+    creature:fixedUpdateCollision(dt)
+  end
 end
 
 function M:draw()

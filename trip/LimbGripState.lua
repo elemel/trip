@@ -6,18 +6,16 @@ local sin = math.sin
 
 local M = Class.new()
 
-function M:init(limb, config)
+function M:init(limb, targetFixture, config)
   self.limb = assert(limb)
+  self.targetFixture = assert(targetFixture)
   self.creature = assert(self.limb.creature)
   self.engine = assert(self.creature.engine)
 
-  local x, y = self.creature.body:getWorldPoint(self.limb.localX, self.limb.localY)
-  self.body = love.physics.newBody(self.engine.world, x, y, "dynamic")
-  self.body:setFixedRotation(true)
+  local targetBody = targetFixture:getBody()
 
-  local shape = love.physics.newCircleShape(0.125)
-  self.fixture = love.physics.newFixture(self.body, shape)
-  self.fixture:setSensor(true)
+  local pawX, pawY = self.creature.body:getWorldPoint(
+    self.limb.localPawX, self.limb.localPawY)
 
   local baseAngle = love.math.random() * 2 * pi
   self.distanceJoints = {}
@@ -31,7 +29,7 @@ function M:init(limb, config)
     x1, y1 = self.creature.body:getWorldPoint(x1, y1)
 
     self.distanceJoints[i] = love.physics.newDistanceJoint(
-      self.creature.body, self.body, x1, y1, x, y)
+      self.creature.body, targetBody, x1, y1, pawX, pawY, true)
 
     self.distanceJoints[i]:setFrequency(8)
     self.distanceJoints[i]:setDampingRatio(1)
@@ -43,12 +41,12 @@ function M:destroy()
     self.distanceJoints[i]:destroy()
     self.distanceJoints[i] = nil
   end
+end
 
-  self.fixture:destroy()
-  self.fixture = nil
+function M:fixedUpdateControl(dt)
+end
 
-  self.body:destroy()
-  self.body = nil
+function M:fixedUpdateCollision(dt)
 end
 
 return M
