@@ -1,6 +1,7 @@
 local Class = require("trip.Class")
 
 local cos = math.cos
+local insert = table.insert
 local pi = math.pi
 local sin = math.sin
 
@@ -23,16 +24,18 @@ function M:init(limb, targetFixture, config)
   for i = 1, 3 do
     local anchorAngle = baseAngle + i * 2 * pi / 3
 
-    local x1 = cos(anchorAngle) * self.creature.radius
-    local y1 = sin(anchorAngle) * self.creature.radius
+    local localX1 = cos(anchorAngle) * self.creature.radius
+    local localY1 = sin(anchorAngle) * self.creature.radius
 
-    x1, y1 = self.creature.body:getWorldPoint(x1, y1)
+    local x1, y1 = self.creature.body:getWorldPoint(localX1, localY1)
 
-    self.distanceJoints[i] = love.physics.newDistanceJoint(
+    local distanceJoint = love.physics.newDistanceJoint(
       self.creature.body, targetBody, x1, y1, pawX, pawY, true)
 
-    self.distanceJoints[i]:setFrequency(8)
-    self.distanceJoints[i]:setDampingRatio(1)
+    distanceJoint:setFrequency(8)
+    distanceJoint:setDampingRatio(1)
+
+    insert(self.distanceJoints, distanceJoint)
   end
 end
 
